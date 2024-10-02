@@ -140,24 +140,24 @@ def prompt_worker(q, server):
         flags = q.get_flags()
         free_memory = flags.get("free_memory", False)
 
-        if flags.get("unload_models", free_memory):
-            comfy.model_management.unload_all_models()
-            need_gc = True
-            last_gc_collect = 0
+        # if flags.get("unload_models", free_memory):
+        #     comfy.model_management.unload_all_models()
+        #     need_gc = True
+        #     last_gc_collect = 0
 
-        if free_memory:
-            e.reset()
-            need_gc = True
-            last_gc_collect = 0
+        # if free_memory:
+        #     e.reset()
+        #     need_gc = True
+        #     last_gc_collect = 0
 
-        if need_gc:
-            current_time = time.perf_counter()
-            if (current_time - last_gc_collect) > gc_collect_interval:
-                comfy.model_management.cleanup_models()
-                gc.collect()
-                comfy.model_management.soft_empty_cache()
-                last_gc_collect = current_time
-                need_gc = False
+        # if need_gc:
+        #     current_time = time.perf_counter()
+        #     if (current_time - last_gc_collect) > gc_collect_interval:
+        #         comfy.model_management.cleanup_models()
+        #         gc.collect()
+        #         comfy.model_management.soft_empty_cache()
+        #         last_gc_collect = current_time
+        #         need_gc = False
 
 async def run(server, address='', port=8188, verbose=True, call_on_start=None):
     addresses = []
@@ -182,6 +182,15 @@ def cleanup_temp():
     if os.path.exists(temp_dir):
         shutil.rmtree(temp_dir, ignore_errors=True)
 
+from nodes import CheckpointLoaderSimple
+def preload_weights(checkpoint_name):
+    loader = CheckpointLoaderSimple()
+    model, clip, vae = loader.load_checkpoint(checkpoint_name)
+    
+    # Model, CLIP, and VAE are now preloaded into memory
+    print(f"Preloaded: {checkpoint_name}")
+    
+    return model, clip, vae
 
 if __name__ == "__main__":
     if args.temp_directory:
@@ -243,6 +252,13 @@ if __name__ == "__main__":
 
     if args.quick_test_for_ci:
         exit(0)
+
+    models_to_preload = [
+        "realvisxlV40_v40LightningBakedvae.safetensors",
+        # Add more model paths as needed
+    ]
+    checkpoint_name = models_to_preload[0]
+    preload_weights(checkpoint_name)
 
     os.makedirs(folder_paths.get_temp_directory(), exist_ok=True)
     call_on_start = None
