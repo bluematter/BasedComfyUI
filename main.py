@@ -254,8 +254,16 @@ if __name__ == "__main__":
         exit(0)
 
     models_to_preload = [
+        "albedobaseXL_v21.safetensors",
+        "nightvisionxl_v0811.safetensors",
+        "counterfeitV30_v30.safetensors",
+        "pixelArtDiffusionXL_pixelWorld.safetensors",
+        "dreamshaperXL_lightningDPMSDE.safetensors",
         "realvisxlV40_v40LightningBakedvae.safetensors",
-        # Add more model paths as needed
+        "epicrealism_naturalSinRC1VAE.safetensors",
+        "stableDiffusion3SD3_sd3MediumInclClips.safetensors",
+        "zavychromaxl_v50.safetensors",
+        "juggernautXL_v9Rdphoto2Lightning.safetensors"
     ]
     checkpoint_name = models_to_preload[0]
     preload_weights(checkpoint_name)
